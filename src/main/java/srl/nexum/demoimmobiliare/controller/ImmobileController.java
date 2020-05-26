@@ -10,8 +10,9 @@ import srl.nexum.demoimmobiliare.repository.ImmobileRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-@CrossOrigin(origins = "http://localhost:8081")
+@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping("/api/immobili")
 public class ImmobileController {
@@ -25,9 +26,9 @@ public class ImmobileController {
             List<Immobile> immobili = new ArrayList<Immobile>();
 
             if (indirizzo == null)
-                immobileRepository.findAll().forEach(immobili::add);
+                immobili.addAll(immobileRepository.findAll());
             else
-                immobileRepository.findByIndirizzo(indirizzo).forEach(immobili::add);
+                immobili.addAll(immobileRepository.findByIndirizzo(indirizzo));
 
             if (immobili.isEmpty()) {
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -40,7 +41,7 @@ public class ImmobileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Immobile> getImmobileById(@PathVariable("id") String id) {
+    public ResponseEntity<Immobile> getImmobileById(@PathVariable("id") UUID id) {
         Optional<Immobile> immobileData = immobileRepository.findById(id);
         if(immobileData.isPresent()) {
             return new ResponseEntity<>(immobileData.get(), HttpStatus.OK);
@@ -60,7 +61,7 @@ public class ImmobileController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Immobile> updateImmobile(@PathVariable("id") String id, @RequestBody Immobile immobile) {
+    public ResponseEntity<Immobile> updateImmobile(@PathVariable("id") UUID id, @RequestBody Immobile immobile) {
         Optional<Immobile> immobileData = immobileRepository.findById(id);
         if(immobileData.isPresent()) {
             Immobile _immobile = immobileData.get();
@@ -74,7 +75,7 @@ public class ImmobileController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteImmobile(@PathVariable("id") String id) {
+    public ResponseEntity<HttpStatus> deleteImmobile(@PathVariable("id") UUID id) {
         try {
             immobileRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
