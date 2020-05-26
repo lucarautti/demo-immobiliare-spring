@@ -10,10 +10,10 @@ import java.util.UUID;
 public class Immobile {
 
     @Id
-    private UUID id;
+    private UUID _id;
 
     private String indirizzo;
-    private int mq;
+    private String mq;
 
     public Immobile(){}
 
@@ -22,15 +22,15 @@ public class Immobile {
         this.mq = mq;
     }
 
-    public String getId() {
-        return id;
+    public UUID getId() {
+        return _id;
     }
 
     public String getIndirizzo() {
         return indirizzo;
     }
 
-    public int getMq() {
+    public String getMq() {
         return mq;
     }
 
@@ -38,12 +38,12 @@ public class Immobile {
         this.indirizzo = indirizzo;
     }
 
-    public void setMq(int mq) {
+    public void setMq(String mq) {
         this.mq = mq;
     }
 
     @Override
     public String toString() {
-        return "Immobile [id=" +id + ", indirizzo=" + indirizzo + ", mq=" + mq +"]";
+        return "Immobile [id=" +_id + ", indirizzo=" + indirizzo + ", mq=" + mq +"]";
     }
 }
