@@ -3,15 +3,17 @@ package srl.nexum.demoimmobiliare.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 
 @Document(collection = "immobili")
 public class Immobile {
 
     @Id
-    private String id;
+    private UUID id;
 
     private String indirizzo;
-    private String mq;
+    private int mq;
 
     public Immobile(){}
 
@@ -28,7 +30,7 @@ public class Immobile {
         return indirizzo;
     }
 
-    public String getMq() {
+    public int getMq() {
         return mq;
     }
 
@@ -36,7 +38,7 @@ public class Immobile {
         this.indirizzo = indirizzo;
     }
 
-    public void setMq(String mq) {
+    public void setMq(int mq) {
         this.mq = mq;
     }
 
