@@ -1,56 +1,70 @@
 package srl.nexum.demoimmobiliare.service;
 
-import com.mongodb.MongoException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.stereotype.Service;
-import srl.nexum.demoimmobiliare.dto.ImmobileDTO;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import srl.nexum.demoimmobiliare.controller.ImmobileController;
 import srl.nexum.demoimmobiliare.model.Immobile;
+import srl.nexum.demoimmobiliare.model.ImmobileQuotation;
 import srl.nexum.demoimmobiliare.repository.ImmobileRepository;
+import srl.nexum.demoimmobiliare.vo.MlConfig;
 
-import java.util.UUID;
+import java.net.URI;
+import java.util.List;
 
-@Service
+@Service("ImmobileServiceImpl")
 public class ImmobileServiceImpl implements ImmobileService {
+
+    private static final Logger logger = LogManager.getLogger(ImmobileController.class);
 
     @Autowired
     private ImmobileRepository immobileRepository;
 
+    @Autowired
+    private MlConfig mlConfig;
+
     @Override
-    public Immobile getImmobileById(UUID id) {
-        if (immobileRepository.findById(id).isPresent())
-            return immobileRepository.findById(id).get();
-        else
-            throw new MongoException("Immobile non trovato");
+    public List<Immobile> findAll() {
+        logger.info("ImmobileServiceImpl->findAll");
+
+        List<Immobile> immobili =immobileRepository.findAll();
+        return immobili;
     }
 
     @Override
-    public Immobile createImmobile(ImmobileDTO immobileDTO) {
-        Immobile immobile = new Immobile(immobileDTO.getIndirizzo(), immobileDTO.getMq());
-        return immobileRepository.save(immobile);
+    public Immobile findById(String id) {
+        return immobileRepository.findById(id).get();
     }
 
     @Override
-    public Immobile updateImmobile(ImmobileDTO immobileDTO, UUID id) {
-        if (immobileRepository.findById(id).isPresent()){
-            Immobile existingImmobile = immobileRepository.findById(id).get();
-            existingImmobile.setIndirizzo(immobileDTO.getIndirizzo());
-            existingImmobile.setMq(immobileDTO.getMq());
-            return immobileRepository.save(existingImmobile);
-        }
-        else
-            throw new MongoException("Immobile non trovato");
+    public void save(Immobile immobile) {
+        immobileRepository.save(immobile);
     }
 
     @Override
-    public Immobile deleteImmobileById(UUID id) {
-        if (immobileRepository.findById(id).isPresent()) {
-            Immobile immobile = immobileRepository.findById(id).get();
-            immobileRepository.delete(immobile);
-            return immobile;
-        }
-        else
-            throw new MongoException("Immobile non trovato");
+    @Transactional
+    public ImmobileQuotation searchAndSave(Immobile immobile) throws Exception{
+        immobileRepository.save(immobile);
+
+        //Chiamata al servizio ML e sostituire i valori fissi
+        String srvUrl = mlConfig.getSrvUrl();
+        URI url = new URI(srvUrl);
+        RestTemplate restTemplate = new RestTemplate();
+
+        //ImmobileQuotation immobileQuotation= new ImmobileQuotation();
+        //immobileQuotation.setCprMin(new Double("75000.00").doubleValue());
+        //immobileQuotation.setCprMax(new Double("125000.00").doubleValue());
+        ImmobileQuotation immobileQuotation=restTemplate.postForObject(url, immobile, ImmobileQuotation.class);
+        return immobileQuotation;
     }
 
-
+    @Override
+    public void delete(String id) {
+        Immobile immobile = immobileRepository.findById(id).get();
+        immobileRepository.delete(immobile);
+    }
 }

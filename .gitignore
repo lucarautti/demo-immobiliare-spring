@@ -29,3 +29,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### mongoDB data folder ###
+data/
+
+### log
+*.log
+/logs

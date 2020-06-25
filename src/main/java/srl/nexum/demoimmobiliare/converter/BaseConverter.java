@@ -19,7 +19,7 @@ public class BaseConverter {
     @Autowired
     private ModelMapper modelMapper;
 
-    protected <T extends Immobile, E extends ImmobileDTO> E convertToDto(T entity, Class<E> dtoClass) {
+    protected <T, E> E convertToDto(T entity,Class<E> dtoClass) {
         E dto=null;
         try{
             dto = modelMapper.map(entity, dtoClass);
@@ -29,10 +29,14 @@ public class BaseConverter {
         return dto;
     }
 
-    protected <T extends ImmobileDTO, E extends Immobile> E convertToEntity(T dto, Class<E> entityClazz) {
+    protected <T, E> E convertToEntity(T dto,Class<E> entityClazz) {
         E entity=null;
-        modelMapper.addConverter(stringToBigDecimal);
-        entity = modelMapper.map(dto, entityClazz);
+        try {
+            modelMapper.addConverter(stringToBigDecimal);
+            entity = modelMapper.map(dto, entityClazz);
+        } catch(Exception e){
+            logger.error("BaseController->convertToEntity Message: Errore-> " + e);
+        }
         return entity;
     }
 

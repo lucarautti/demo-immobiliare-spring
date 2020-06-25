@@ -1,0 +1,31 @@
+image: docker:latest
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  SPRING_PROFILES_ACTIVE: gitlab-ci
+
+stages:
+  - build
+  - package
+  - deploy
+ 
+maven-build-dev:
+  image: maven:3-jdk-8
+  stage: build
+  script:
+    - mvn package -B -DskipTests
+  artifacts:
+    paths:
+      - target/*.war
+
+docker-build-dev:
+  stage: package
+  before_script:
+      - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest --build-arg JAR_FILE=target/*.war -f docker/Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:latest
+  after_script:
+    - docker logout

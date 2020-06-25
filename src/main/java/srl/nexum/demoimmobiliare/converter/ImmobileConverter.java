@@ -8,14 +8,12 @@ import srl.nexum.demoimmobiliare.dto.ImmobileDTO;
 @Component
 public class ImmobileConverter extends BaseConverter {
 
-    public Immobile fill(ImmobileDTO dto) throws Exception{
-        Immobile entity=convertToEntity(dto,Immobile.class);
-        return entity;
+    public Immobile fill(ImmobileDTO dto){
+        return convertToEntity(dto,Immobile.class);
     }
 
-    public ImmobileDTO fill(Immobile entity)throws Exception{
-        ImmobileDTO dto = convertToDto(entity,ImmobileDTO.class);
-        return dto;
+    public ImmobileDTO fill(Immobile entity){
+        return convertToDto(entity,ImmobileDTO.class);
     }
 }
 

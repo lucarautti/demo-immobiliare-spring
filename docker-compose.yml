@@ -1,0 +1,106 @@
+version: '3'
+
+networks:
+  ntpgsql:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.21.0.0/24
+
+services:
+  mongo:
+    restart: unless-stopped
+    container_name: mongo
+    hostname: mongo
+    image: registry.gitlab.com/stefano.novelli/housequot-mongodb
+    environment:
+      - MONGO_INITDB_DATABASE=admin
+      - MONGO_INITDB_ROOT_USERNAME= admin
+      - MONGO_INITDB_ROOT_PASSWORD= admin
+    volumes:
+      - ../housequot-mongodb/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ../mongo-volume:/data/db
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.5
+    ports:
+      - 37017:27017
+
+  backend:
+    image: registry.gitlab.com/stefano.novelli/housequot
+    container_name: backend
+    hostname: backend
+    depends_on:
+      - mongo
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.6
+    ports:
+      - 8080:8080
+    links:
+      - mongo
+
+  frontend:
+    image: registry.gitlab.com/stefano.novelli/housequot-frontend
+    hostname: frontend
+    depends_on:
+      - backend
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.7
+    ports:
+      - 4200:4200
+    links:
+      - backend
+
+  authservice:
+    image: registry.gitlab.com/stefano.novelli/auth-service
+    container_name: auth-service
+    hostname: auth-service
+    depends_on:
+      - gestione-utenti
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.8
+    ports:
+      - 9100:9100
+    links:
+      - gestione-utenti
+
+  gestione-utenti:
+    image: registry.gitlab.com/stefano.novelli/gestione-utenti
+    container_name: gestione-utenti
+    hostname: gestione-utenti
+    depends_on:
+      - mongo
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.9
+    ports:
+      - 8019:8019
+    links:
+      - mongo
+
+  housequot-quoteml:
+    image: registry.gitlab.com/stefano.novelli/housequot-quoteml
+    container_name: housequot-quoteml
+    hostname: housequot-quoteml
+    ports:
+      - 5004:5000
+    networks:
+      ntpgsql:
+        ipv4_address: 192.21.0.10
+    command: python /usr/src/app/src/manage.py run -h 0.0.0.0
+    #volumes:
+    # - .:/usr/src/app
+    environment:
+      - FLASK_DEBUG=0
+      - APP_SETTINGS=src.config.DevelopmentConfig
+      - PYTHONPATH=/usr/src/app
+    depends_on:
+      - redis
+      - mongo
+
+  redis:
+    image: redis:5.0.7-alpine
