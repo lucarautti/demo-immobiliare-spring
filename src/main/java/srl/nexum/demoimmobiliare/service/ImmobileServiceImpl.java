@@ -3,11 +3,9 @@ package srl.nexum.demoimmobiliare.service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.client.support.BasicAuthenticationInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import srl.nexum.demoimmobiliare.controller.ImmobileController;
 import srl.nexum.demoimmobiliare.model.Immobile;
 import srl.nexum.demoimmobiliare.model.ImmobileQuotation;
 import srl.nexum.demoimmobiliare.repository.ImmobileRepository;
@@ -19,7 +17,7 @@ import java.util.List;
 @Service("ImmobileServiceImpl")
 public class ImmobileServiceImpl implements ImmobileService {
 
-    private static final Logger logger = LogManager.getLogger(ImmobileController.class);
+    private static final Logger logger = LogManager.getLogger(ImmobileServiceImpl.class);
 
     @Autowired
     private ImmobileRepository immobileRepository;
@@ -37,17 +35,23 @@ public class ImmobileServiceImpl implements ImmobileService {
 
     @Override
     public Immobile findById(String id) {
+        logger.info("ImmobileServiceImpl->findById");
+
         return immobileRepository.findById(id).get();
     }
 
     @Override
     public void save(Immobile immobile) {
+        logger.info("ImmobileServiceImpl->save");
+
         immobileRepository.save(immobile);
     }
 
     @Override
     @Transactional
     public ImmobileQuotation searchAndSave(Immobile immobile) throws Exception{
+        logger.info("ImmobileServiceImpl->searchAndSave");
+
         immobileRepository.save(immobile);
 
         //Chiamata al servizio ML e sostituire i valori fissi
@@ -64,6 +68,8 @@ public class ImmobileServiceImpl implements ImmobileService {
 
     @Override
     public void delete(String id) {
+        logger.info("ImmobileServiceImpl->delete");
+
         Immobile immobile = immobileRepository.findById(id).get();
         immobileRepository.delete(immobile);
     }

@@ -32,7 +32,6 @@ public class ImmobileValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "longitude", "error.immobile.longitude.mandatory");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "stato", "error.immobile.stato.mandatory");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "descrizione_tipologia", "error.immobile.descrizione_tipologia.mandatory");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "fascia", "error.immobile.fascia.mandatory");
     }
 
     public void validateIncorrect(ImmobileDTO immobileDTO, Errors errors) {

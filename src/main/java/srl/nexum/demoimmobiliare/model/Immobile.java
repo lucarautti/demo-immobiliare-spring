@@ -1,5 +1,6 @@
 package srl.nexum.demoimmobiliare.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,25 +9,27 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Immobile {
 
     @Id
+    @JsonIgnore
     private String id;
-
+    @JsonIgnore
     private String name;
+    @JsonIgnore
     private String surname;
+
+    @JsonProperty("indirizzo_completo")
     private String address;
+    @JsonIgnore
     private String city;
+    @JsonIgnore
     private String email;
+    @JsonIgnore
     private String phone;
     private String latitude;
     private String longitude;
+    private int stato;
 
-    @JsonProperty("status")
-    private String stato;
-
-    @JsonProperty("description_type")
-    private String descrizione_tipologia;
-
-    @JsonProperty("band")
-    private String fascia;
+    @JsonProperty("tipologia")
+    private int descrizione_tipologia;
 
     public Immobile(){}
 
@@ -38,8 +41,8 @@ public class Immobile {
                      String phone,
                      String latitude,
                      String longitude,
-                     String stato,
-                     String descrizione_tipologia,
+                     int stato,
+                     int descrizione_tipologia,
                      String fascia
                      ) {
         this.name = name;
@@ -52,7 +55,6 @@ public class Immobile {
         this.longitude = longitude;
         this.stato = stato;
         this.descrizione_tipologia = descrizione_tipologia;
-        this.fascia = fascia;
     }
 
     public String getId(){ return id;}
@@ -77,11 +79,13 @@ public class Immobile {
 
     public String getLongitude() { return longitude; }
 
-    public String getStato() { return stato; }
+    public int getStato() {
+        return stato;
+    }
 
-    public String getDescrizione_tipologia() { return descrizione_tipologia; }
-
-    public String getFascia() { return fascia; }
+    public void setStato(int stato) {
+        this.stato = stato;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -103,13 +107,13 @@ public class Immobile {
 
     public void setLongitude(String longitude) { this.longitude = longitude; }
 
-    public void setStato(String stato) { this.stato = stato; }
-
-    public void setDescrizione_tipologia(String descrizione_tipologia) {
-        this.descrizione_tipologia = descrizione_tipologia;
+    public int getDescrizione_tipologia() {
+        return descrizione_tipologia;
     }
 
-    public void setFascia(String fascia) { this.fascia = fascia; }
+    public void setDescrizione_tipologia(int descrizione_tipologia) {
+        this.descrizione_tipologia = descrizione_tipologia;
+    }
 
     @Override
     public String toString() {
@@ -117,13 +121,12 @@ public class Immobile {
                 + ", surname=" + surname
                 + ", address=" + address
                 + ", city=" + city
-                + "email=" + email
+                + ", email=" + email
                 + ", phone=" + phone
                 + ", latitude=" + latitude
                 + ", longitude=" + longitude
                 + ", stato=" + stato
                 + ", descrizione_tipologia=" + descrizione_tipologia
-                + ", fascia=" + fascia
                 +"]";
     }
 }
